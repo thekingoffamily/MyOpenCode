@@ -41,7 +41,7 @@ if %errorlevel%==0 (
   echo.
   if exist "%DST%" (
     echo [2/3] Merging aiTunnel into existing %DST% ...
-    node "%~dp0install-merge.js" "%~dp0opencode.json" "%DST%"
+    node "%~dp0install-merge.cjs" "%~dp0opencode.json" "%DST%"
   ) else (
     echo [2/3] Writing new config to %DST% ...
     copy /y "%~dp0opencode.json" "%DST%" >nul

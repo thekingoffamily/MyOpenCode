@@ -34,7 +34,7 @@ if [ -f "$dst" ] && grep -q '"aitunnel"' "$dst"; then
 else
   if command -v node >/dev/null 2>&1; then
     echo "[2/3] Merging aiTunnel into $dst ..."
-    node "$(dirname "$0")/install-merge.js" "$src" "$dst"
+    node "$(dirname "$0")/install-merge.cjs" "$src" "$dst"
   else
     echo "[2/3] Writing new config to $dst ..."
     cp "$src" "$dst"

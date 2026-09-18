@@ -9,7 +9,7 @@
   (дефолт `aitunnel/auto`, малые задачи `aitunnel/deepseek-v4-flash`);
 - `install.cmd` / `install.sh` — установщики (ставит opencode + провайдер глобально);
 - `remote-server.sh` — запуск opencode фоном на сервере + доступ через SSH и браузер (GUI, не CLI);
-- `install-merge.js` — умное слияние конфигов (не затирает твои провайдеры).
+- `install-merge.cjs` — умное слияние конфигов (не затирает твои провайдеры).
 
 ---
 
