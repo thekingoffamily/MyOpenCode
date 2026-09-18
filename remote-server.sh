@@ -21,16 +21,27 @@ if ! command -v opencode >/dev/null 2>&1 && [ ! -x "$HOME/.opencode/bin/opencode
   echo "[setup] installing opencode ..."
   curl -fsSL https://opencode.ai/install | bash
 fi
-if command -v opencode >/dev/null 2>&1; then
-  OC="opencode"
-else
+
+# Always use an ABSOLUTE path: the tmux shell does not inherit the interactive
+# PATH (which normally includes ~/.opencode/bin), so a bare `opencode` would
+# fail with "command not found" and kill the session silently.
+if [ -x "$HOME/.opencode/bin/opencode" ]; then
   OC="$HOME/.opencode/bin/opencode"
+elif command -v opencode >/dev/null 2>&1; then
+  OC="$(command -v opencode)"
+else
+  echo "ERROR: opencode binary not found (tried \$HOME/.opencode/bin/opencode and PATH)."
+  exit 1
 fi
 
 if ! command -v tmux >/dev/null 2>&1; then
   echo "ERROR: tmux not found. Install it:  apt install tmux  (or:  yum/dnf install tmux)"
   exit 1
 fi
+
+echo "[start] freeing port $PORT (stale server keeps old config) ..."
+fuser -k "${PORT}/tcp" 2>/dev/null || true
+sleep 1
 
 echo "[start] killing old session '$SESSION' if any ..."
 tmux kill-session -t "$SESSION" 2>/dev/null || true
@@ -43,6 +54,10 @@ echo
 echo "============================================================"
 tmux ls
 echo "============================================================"
+if command -v curl >/dev/null 2>&1; then
+  echo
+  curl -s -o /dev/null -w "  HTTP check: http://127.0.0.1:$PORT/ -> %{http_code}\n" "http://127.0.0.1:$PORT/" || true
+fi
 echo
 echo "  Server is up on 127.0.0.1:$PORT (GUI + HTTP API)."
 echo

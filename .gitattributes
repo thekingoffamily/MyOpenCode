@@ -1,2 +1,9 @@
 packages/core/migration/**/snapshot.json linguist-generated
 packages/core/src/database/migration.gen.ts linguist-generated
+
+# Distro scripts must stay LF everywhere (servers run them via ssh/tmux/bash pipes)
+*.sh text eol=lf
+install.cmd text eol=crlf
+install-merge.cjs text eol=lf
+remote-server.sh text eol=lf
+opencode.json text eol=lf
