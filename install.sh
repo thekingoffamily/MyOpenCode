@@ -14,7 +14,11 @@ elif [ -x "$HOME/.opencode/bin/opencode" ]; then
   OC="$HOME/.opencode/bin/opencode"
 else
   echo "[1/3] Installing opencode..."
-  curl -fsSL https://opencode.ai/install | sh
+  if command -v bash >/dev/null 2>&1; then
+    curl -fsSL https://opencode.ai/install | bash
+  else
+    curl -fsSL https://opencode.ai/install | sh
+  fi
   OC="$HOME/.opencode/bin/opencode"
 fi
 echo "[1/3] opencode: $($OC --version)"

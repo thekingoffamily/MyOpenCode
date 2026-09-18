@@ -19,7 +19,7 @@ DIR="${1:-$HOME}"
 # ensure opencode installed (also sets up aiTunnel config)
 if ! command -v opencode >/dev/null 2>&1 && [ ! -x "$HOME/.opencode/bin/opencode" ]; then
   echo "[setup] installing opencode ..."
-  curl -fsSL https://opencode.ai/install | sh
+  curl -fsSL https://opencode.ai/install | bash
 fi
 if command -v opencode >/dev/null 2>&1; then
   OC="opencode"
