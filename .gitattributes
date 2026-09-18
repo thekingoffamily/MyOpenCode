@@ -6,4 +6,5 @@ packages/core/src/database/migration.gen.ts linguist-generated
 install.cmd text eol=crlf
 install-merge.cjs text eol=lf
 remote-server.sh text eol=lf
+aitunnel-relay.cjs text eol=lf
 opencode.json text eol=lf

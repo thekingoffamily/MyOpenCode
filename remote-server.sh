@@ -39,6 +39,38 @@ if ! command -v tmux >/dev/null 2>&1; then
   exit 1
 fi
 
+# Some hosts have NO global IPv6 (ip -6 route shows only fe80::). api.aitunnel.ru
+# answers DNS with AAAA first, so opencode's runtime stalls on IPv6 and the chat
+# dies with "token not specified" / hangs. Fix: a local node relay (node uses IPv4)
+# and point baseURL at 127.0.0.1.
+if ! ip -6 route | grep -q '^default'; then
+  echo "[ipv6] no global IPv6 route detected."
+  if command -v node >/dev/null 2>&1; then
+    RELAY_DST="$HOME/.opencode/aitunnel-relay.cjs"
+    if [ -f ./aitunnel-relay.cjs ] && [ ! -f "$RELAY_DST" ]; then
+      cp ./aitunnel-relay.cjs "$RELAY_DST"
+    fi
+    if [ -f "$RELAY_DST" ]; then
+      RELAY_PORT="${AITUNNEL_RELAY_PORT:-8787}"
+      echo "[ipv6] starting local relay on 127.0.0.1:$RELAY_PORT -> api.aitunnel.ru"
+      pkill -9 -f 'aitunnel-relay' 2>/dev/null || true
+      sleep 1
+      nohup env AITUNNEL_RELAY_PORT="$RELAY_PORT" node "$RELAY_DST" > /tmp/relay-nohup.log 2>&1 &
+      sleep 2
+      CFG="$HOME/.config/opencode/opencode.json"
+      if [ -f "$CFG" ]; then
+        cp "$CFG" "$CFG.bak" 2>/dev/null || true
+        sed -i "s|https://api.aitunnel.ru/v1|http://127.0.0.1:$RELAY_PORT/v1|" "$CFG"
+        echo "[ipv6] baseURL in $CFG pointed to the relay (backup: $CFG.bak)"
+      fi
+    else
+      echo "WARN: no aitunnel-relay.cjs found (skip; IPv6 is likely broken here)."
+    fi
+  else
+    echo "WARN: node not found; no relay possible on this IPv6-less host."
+  fi
+fi
+
 echo "[start] freeing port $PORT (stale server keeps old config) ..."
 fuser -k "${PORT}/tcp" 2>/dev/null || true
 sleep 1
